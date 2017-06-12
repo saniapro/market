@@ -9,7 +9,7 @@ import (
 
 //type extType
 
-type TargetDeltas struct 
+type TargetDeltas struct
 {
 	views uint32
 	clicks uint32
@@ -56,16 +56,22 @@ type Targets struct {
 	list TargetsList
 }
 
-const TARGET_SQL_FIELDS = "t.status AS tstatus, priority, aclHours, aclWeekDay, aclRegion, aclAgeSex, aclCats, retargetID, viewsUserDayLimit, periods, viewsDayLimit, viewsToday, viewsYesterday, views, clicksToday, clicksYesterday, clicks, spentLimit, spent, spentDayLimit, spentToday, maxPrice"
+const TARGET_SQL_FIELDS = `t.status AS tstatus, priority, aclHours, aclWeekDay, aclRegion, retargetID,
+viewsUserDayLimit, periods, viewsDayLimit, viewsToday, viewsYesterday,
+views, clicksToday, clicksYesterday, clicks, spentLimit, spent, spentDayLimit, spentToday, maxPrice`
 
-/*func (ad *Ad)setFromRow(rows *sql.Rows) {
-	err := rows.Scan(&ad.id, &ad.campaign, &ad.target, &ad.status, &ad.width, &ad.height, &ad.ext, &ad.text, &ad.text1, &ad.price)
+func (t *Target)setFromRow(rows *sql.Rows) {
+	periods := ""
+	err := rows.Scan(&t.id, &t.status, &t.priority, &t.aclHours, &t.aclWeekDay, &t.aclRegion, &t.retargetID,
+	&t.viewsUserDayLimit, &periods, &t.viewsDayLimit , &t.viewsToday, &t.viewsYesterday,
+	&t.views, &t.clicksToday, &t.clicksYesterday, &t.clicks, &t.spentLimit,
+	&t.spent, &t.spentDayLimit, &t.spentToday, &t.maxPrice)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (src *Ad)Reload(dst *Ad) {
+/*func (src *Ad)Reload(dst *Ad) {
 	log.Println("Reload ", src.id);
 	src.campaign = dst.campaign;
 	src.status = dst.status;
@@ -112,7 +118,7 @@ func (a *Ads)Load(id uint32, db *sql.DB) *Ad {
 */
 func (r *Targets)LoadAll(db *sql.DB) {
 	log.Print("Load targets.")
-	rows, err := db.Query(fmt.Sprintf("SELECT %s FROM target WHERE !(status&128) LIMIT 3000000", TARGET_SQL_FIELDS))
+	rows, err := db.Query(fmt.Sprintf("SELECT id, %s FROM target WHERE !(status&128) LIMIT 3000000", TARGET_SQL_FIELDS))
 	defer rows.Close()
 	if err != nil {
 		log.Fatal(err)

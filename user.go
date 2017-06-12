@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type userDeltas struct 
+type userDeltas struct
 {
 	earnedMy float64
 	earnedOther float64

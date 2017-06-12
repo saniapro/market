@@ -38,6 +38,7 @@ func jsonCMD(res http.ResponseWriter, req *http.Request) {
 		}
 	} else if ad := ads.list[m.ID]; ad != nil {
 		fmt.Fprintln(res, ad.getJson())
+		ad.countView()
 	} else {
 		fmt.Fprintln(res, "{\"Not found ad\":", m.ID, "}")
 	}
@@ -45,6 +46,7 @@ func jsonCMD(res http.ResponseWriter, req *http.Request) {
 
 var ads Ads
 var users Users
+var sites Sites
 
 func getDB() (db *sql.DB, err error) {
 	//db, err = sql.Open("mysql", "banner:Y9Y50vdm@tcp(statmaster.mi6.kiev.ua:3306)/uho")
@@ -76,7 +78,16 @@ func main() {
 		}
 		db1.Close()
 	}()
-	
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+			db, err := getDB()
+		if err == nil {
+			sites.LoadAll(db)
+		}
+	}()
+
 	wg.Wait()
 	log.Print("All load")
 	var m runtime.MemStats

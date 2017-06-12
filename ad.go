@@ -31,13 +31,17 @@ type Ads struct {
 	list AdsList
 }
 
-const AD_SQL = "SELECT ad.id, campaignID, targetID, ad.status, width, height, ext, text, text1, url, price, t.status AS tstatus, priority, aclHours, aclWeekDay, aclRegion, aclAgeSex, aclCats, retargetID, viewsUserDayLimit, periods, viewsDayLimit, viewsToday, viewsYesterday, views, clicksToday, clicksYesterday, clicks, spentLimit, spent, spentDayLimit, spentToday, maxPrice FROM ad JOIN target AS t ON t.id=ad.targetID WHERE !(ad.status&128) AND t.status&1"
+const AD_SQL = `SELECT ad.id, campaignID, targetID, ad.status, width, height, ext, text, text1, url, price, t.status AS tstatus, priority,
+aclHours, aclWeekDay, aclRegion, aclAgeSex, aclCats, retargetID, viewsUserDayLimit, periods,
+viewsDayLimit, viewsToday, viewsYesterday, views, clicksToday, clicksYesterday, clicks, spentLimit, spent, spentDayLimit, spentToday, maxPrice
+FROM ad JOIN target AS t ON t.id=ad.targetID WHERE !(ad.status&128) AND t.status&1`
 
 func (ad *Ad)setFromRow(rows *sql.Rows) {
 	target:=ad.target
 	periods:=""
 	err := rows.Scan(&ad.id, &ad.campaign, &target.id, &ad.status, &ad.width, &ad.height, &ad.ext, &ad.text, &ad.text1, &ad.url, &ad.price,
-			&target.status, &target.priority, &target.aclHours, &target.aclWeekDay, &target.aclRegion, &target.aclAgeSex, &target.aclCats, &target.retargetID, &target.viewsUserDayLimit, &periods, &target.viewsDayLimit , &target.viewsToday, &target.viewsYesterday, &target.views, &target.clicksToday, &target.clicksYesterday, &target.clicks, &target.spentLimit, &target.spent, &target.spentDayLimit, &target.spentToday, &target.maxPrice)
+			&target.status, &target.priority, &target.aclHours, &target.aclWeekDay, &target.aclRegion, &target.retargetID,
+			&target.viewsUserDayLimit, &periods, &target.viewsDayLimit , &target.viewsToday, &target.viewsYesterday, &target.views, &target.clicksToday, &target.clicksYesterday, &target.clicks, &target.spentLimit, &target.spent, &target.spentDayLimit, &target.spentToday, &target.maxPrice)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,5 +126,6 @@ func (r *Ads)LoadAll(db *sql.DB) {
 	log.Println(len(r.list), "ads");
 }
 
-
-
+func (ad *Ad)countView() {
+	ad.target.views++
+}
